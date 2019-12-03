@@ -15,23 +15,31 @@ def hsv_segmentation(path):
     hsv = cv2.cvtColor(rgb_image, cv2.COLOR_BGR2HSV)  # we convert to hsv
     centers = []
 
-    for [i, j, color] in [[[0, 160], [10, 180], 'red'], [45, 75, 'green'], [20, 32, 'yellow'], [100, 120, 'blue']]:
+    for [i, j, color] in [[[0, 170], [5, 180], 'red'], [45, 75, 'green'], [24, 32, 'yellow'], [100, 120, 'blue']]:
         if color == 'red':
-            mask = cv2.inRange(hsv, np.array([i[0], 140, 90]), np.array([j[0], 255, 255]))
-            mask += cv2.inRange(hsv, np.array([i[1], 140, 90]), np.array([j[1], 255, 255]))  # RED
+            mask = cv2.inRange(hsv, np.array([i[0], 200, 50]), np.array([j[0], 255, 255]))
+            mask += cv2.inRange(hsv, np.array([i[1], 200, 50]), np.array([j[1], 255, 255]))  # RED
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((2, 2), np.uint8))
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((2, 2), np.uint8))  # filter to kill noise
+
         elif color == 'blue':
             mask = cv2.inRange(hsv, np.array([i, 50, 30]), np.array([j, 255, 255]))  # BLUE
-            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((2, 2), np.uint8))
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((2, 2), np.uint8))
+
         elif color == 'yellow':
-            mask = cv2.inRange(hsv, np.array([i, 140, 110]), np.array([j, 255, 255]))  # YELLOW
+            mask = cv2.inRange(hsv, np.array([i, 200, 110]), np.array([j, 255, 255]))  # YELLOW
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((2, 2), np.uint8))  # filter to kill noise
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((2, 2), np.uint8))
+
+        elif color == 'green':
+            mask = cv2.inRange(hsv, np.array([i, 150, 60]), np.array([j, 255, 255]))  # GREEN
+            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, np.ones((2, 2), np.uint8))
+            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((2, 2), np.uint8))  # filter to kill noise
             #cv2.imshow('im', hsv)
             #cv2.imshow('rgb', rgb_image)
             #cv2.imshow('blue', mask)
             #cv2.waitKey(0)
-        elif color == 'green':
-            mask = cv2.inRange(hsv, np.array([i, 75, 75]), np.array([j, 255, 255]))  # GREEN
-
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))  # filter to kill noise
 
         indexes = np.where(mask == 255)  # we get the coordinates of the pixels segmented
 
@@ -46,14 +54,16 @@ def hsv_segmentation(path):
             color_bgr = {'red': (0, 0, 255), 'green': (0, 255, 0), 'yellow': (0, 255, 255), 'blue': (255, 0, 0)}
             cv2.circle(rgb_image, (center_y, center_x), 15, color_bgr[color], thickness=1)
             # print(color, center_x, center_y)
-            cv2.imwrite(path + '_mask_' + color + ".png", mask)
+            #cv2.imwrite(path + '_mask_' + color + ".png", mask)
 
         except IndexError:
             print('There is none or more than one ' + color + ' object in the image')
             centers.append([color, '-', '-'])
-            cv2.imwrite(path + "_mask_" + color + ".png", mask)
+            #cv2.imwrite(path + "_mask_" + color + ".png", mask)
 
     np.savetxt(path + '.csv', centers, delimiter=",", fmt='%s')
     # we show the image with the drawn circles
+    plt.figure()
     plt.imshow(cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB))
-    plt.show()
+    plt.show(block=False)
+    plt.pause(1)

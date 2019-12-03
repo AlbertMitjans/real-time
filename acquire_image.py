@@ -1,5 +1,9 @@
-from msg_to_pixels import Msg2Pixels
+from Utils.msg_to_pixels import Msg2Pixels
 from read_images import read_image
+import os
+
+os.environ['ROS_MASTER_URI'] = 'http://192.168.102.10:11311'  # connection to raspberry pi
+os.environ['ROS_IP'] = '192.168.102.10'
 
 i = 0
 
@@ -21,7 +25,7 @@ while True:
     except ValueError:
         pass
 
-    a.save_images(path + 'image' + str(i))
+    save = a.save_images(path + 'image' + str(i))
     read_image(path + 'image' + str(i))
     i += 1
 
