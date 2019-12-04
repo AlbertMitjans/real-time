@@ -18,7 +18,7 @@ from scipy.ndimage.measurements import center_of_mass, label
 
 from PIL import Image, ImageFilter
 
-from Hourglass_2.Stacked_Hourglass import HourglassNet, Bottleneck
+from Hourglass.Stacked_Hourglass import HourglassNet, Bottleneck
 from losses import JointsMSELoss
 
 
@@ -390,8 +390,8 @@ def gaussian_red(image, corners, kernel=20, nsig=5, target_size=(1, 76, 124)):
     return target
 
 
-def gaussian(image, corners, kernel=39, nsig=5, target_size=(304, 495)):
-    target = np.zeros((4, target_size[0], target_size[1]))
+def gaussian(image, corners, kernel=39, nsig=5):
+    target = np.zeros((4, image.shape[0], image.shape[1]))
     n = float(image.shape[0]) / float(target.shape[1])
     m = float(image.shape[1]) / float(target.shape[2])
     for i, (x, y) in enumerate(corners):
@@ -405,7 +405,7 @@ def gaussian(image, corners, kernel=39, nsig=5, target_size=(304, 495)):
             ay = b - kern2d.shape[1] // 2
             paste(target[i], kern2d / kern2d.max(), (ax, ay))
 
-    target = np.resize(target.sum(0), (1, target_size[0], target_size[1]))
+    target = np.resize(target.sum(0), (1, image.shape[0], image.shape[1]))
 
     return target
 
