@@ -24,6 +24,6 @@ def fix_depth(img):
 
 
 def cut_image(img):
-    img = img[152:456, 92:588]
+    img = img[152:456, 92:585]
     return img
 
