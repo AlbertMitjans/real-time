@@ -1,7 +1,12 @@
 import numpy as np
+import torchvision.transforms as transforms
+from scipy import ndimage
+from skimage.feature import peak_local_max
+from scipy.ndimage.measurements import center_of_mass, label
+import matplotlib.pyplot as plt
 
 
-def fix_depth(img):
+def fill_zero_values(img):
     image = img.copy()
     indices = np.where(image == 0)
 
@@ -27,3 +32,40 @@ def cut_image(img):
     img = img[152:456, 92:585]
     return img
 
+
+def compute_gradient(image):
+    # we compute the gradient of the image
+    '''kx = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]])
+        ky = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
+        sx = ndimage.convolve(depth[0][0], kx)
+        sy = ndimage.convolve(depth[0][0], ky)'''
+    sx = ndimage.sobel(image, axis=0, mode='nearest')
+    sy = ndimage.sobel(image, axis=1, mode='nearest')
+    gradient = transforms.ToTensor()(np.hypot(sx, sy))
+
+    return gradient[0]
+
+
+def local_max(image):
+    max_out = peak_local_max(image, min_distance=19, threshold_rel=0.5, exclude_border=False, indices=False)
+    labels_out = label(max_out)[0]
+    max_out = np.array(center_of_mass(max_out, labels_out, range(1, np.max(labels_out) + 1))).astype(np.int)
+    max_values = []
+
+    for index in max_out:
+        max_values.append(image[index[0]][index[1]])
+
+    max_out = np.array([x for _, x in sorted(zip(max_values, max_out), reverse=True, key=lambda x: x[0])])
+
+    return max_out
+
+
+def plot_gradient(gradient, max_coord):
+    for (i, j) in max_coord:
+        plt.plot(gradient[i], label='Row {top1}'.format(top1=i), color='b')
+        plt.plot(gradient[j], label='Column {top1}'.format(top1=j), color='r')
+        plt.axvline(i, label='Output value', color='b--')
+        plt.axvline(j, label='Output value', color='r--')
+        plt.xlabel('Pixel value')
+        plt.ylabel('Gradient value')
+        plt.savefig('Images/plot_{top1}_{top2}'.format(top1=i, top2=j) + '.png')

@@ -2,21 +2,17 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from Utils.msg_to_pixels import Msg2Pixels
 from Hourglass.Stacked_Hourglass import HourglassNet, Bottleneck
-from Hourglass.my_classes import pad_to_square, gaussian
-from Utils.img_utils import fix_depth, cut_image
 import torch.nn as nn
 import torch
 import os
 import time
-from skimage.feature import peak_local_max
-from scipy.ndimage.measurements import center_of_mass, label
 import numpy as np
 import torchvision.transforms as transforms
 from PIL import ImageFilter
 from PIL import Image
 import skimage.draw as draw
 
-from scipy import ndimage
+from Utils.img_utils import compute_gradient, cut_image, local_max
 
 
 def update(i):
@@ -49,10 +45,10 @@ def get_output():
     contours = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.CONTOUR))
     depth = torch.stack((depth[0], edges[0], depth[0])).unsqueeze(0)
     output = model(depth).cpu().detach().numpy().clip(0)[0][0]
-    max_out = max_gaussian(output)
+    max_coord = local_max(output)
     corners = torch.zeros(3, output.shape[0], output.shape[1])
     grad_values = []
-    for idx, (i, j) in enumerate(max_out):
+    for idx, (i, j) in enumerate(max_coord):
         cx, cy = draw.circle_perimeter(i, j, 5, shape=output.shape)
         if idx < 4:
             grad_values.append(gradient[cx.min():cx.max(), cy.min():cy.max()].sum())
@@ -65,33 +61,6 @@ def get_output():
         else:
             corners[:, cx, cy] = 1.
     return rgb, output, corners, gradient, grad_values
-
-
-def compute_gradient(image):
-    # we compute the gradient of the image
-    '''kx = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]])
-        ky = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
-        sx = ndimage.convolve(depth[0][0], kx)
-        sy = ndimage.convolve(depth[0][0], ky)'''
-    sx = ndimage.sobel(image, axis=0, mode='nearest')
-    sy = ndimage.sobel(image, axis=1, mode='nearest')
-    gradient = transforms.ToTensor()(np.hypot(sx, sy))
-
-    return gradient[0]
-
-
-def max_gaussian(image):
-    max_out = peak_local_max(image, min_distance=19, threshold_rel=0.5, exclude_border=False, indices=False)
-    labels_out = label(max_out)[0]
-    max_out = np.array(center_of_mass(max_out, labels_out, range(1, np.max(labels_out) + 1))).astype(np.int)
-    max_values = []
-
-    for index in max_out:
-        max_values.append(image[index[0]][index[1]])
-
-    max_out = np.array([x for _, x in sorted(zip(max_values, max_out), reverse=True, key=lambda x: x[0])])
-
-    return max_out
 
 
 os.environ['ROS_MASTER_URI'] = 'http://192.168.102.10:11311'  # connection to raspberry pi
