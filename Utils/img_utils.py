@@ -4,6 +4,8 @@ from scipy import ndimage
 from skimage.feature import peak_local_max
 from scipy.ndimage.measurements import center_of_mass, label
 import matplotlib.pyplot as plt
+import torch
+import skimage.draw as draw
 
 
 def fill_zero_values(img):
@@ -60,12 +62,27 @@ def local_max(image):
     return max_out
 
 
-def plot_gradient(gradient, max_coord):
-    for (i, j) in max_coord:
-        plt.plot(gradient[i], label='Row {top1}'.format(top1=i), color='b')
-        plt.plot(gradient[j], label='Column {top1}'.format(top1=j), color='r')
-        plt.axvline(i, label='Output value', color='b--')
-        plt.axvline(j, label='Output value', color='r--')
-        plt.xlabel('Pixel value')
-        plt.ylabel('Gradient value')
-        plt.savefig('Images/plot_{top1}_{top2}'.format(top1=i, top2=j) + '.png')
+def corner_mask(output, gradient):
+    max_coord = local_max(output)
+    corners = torch.zeros(3, output.shape[0], output.shape[1])
+    grad_values = []
+    for idx, (i, j) in enumerate(max_coord):
+        cx, cy = draw.circle_perimeter(i, j, 5, shape=output.shape)
+        if idx < 4:
+            grad_values.append(gradient[cx.min():cx.max(), cy.min():cy.max()].sum())
+            if idx == 3:
+                corners[0, cx, cy] = 1.
+                corners[1, cx, cy] = 1.
+            else:
+                corners[idx, cx, cy] = 1.
+
+        else:
+            corners[:, cx, cy] = 1.
+    return corners, grad_values
+
+
+def depth_layers(depth):
+    edges = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.FIND_EDGES))
+    contours = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.CONTOUR))
+    depth = torch.stack((depth[0], edges[0], depth[0])).unsqueeze(0)
+    return depth

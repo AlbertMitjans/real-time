@@ -10,9 +10,8 @@ import numpy as np
 import torchvision.transforms as transforms
 from PIL import ImageFilter
 from PIL import Image
-import skimage.draw as draw
 
-from Utils.img_utils import compute_gradient, cut_image, local_max
+from Utils.img_utils import compute_gradient, cut_image, corner_mask, depth_layers
 
 
 def update(i):
@@ -41,26 +40,10 @@ def get_output():
     gradient = compute_gradient(depth[0])
 
     # we compute the edges and contour for the neural network
-    edges = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.FIND_EDGES))
-    contours = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.CONTOUR))
-    depth = torch.stack((depth[0], edges[0], depth[0])).unsqueeze(0)
+    depth = depth_layers(depth)
     output = model(depth).cpu().detach().numpy().clip(0)[0][0]
-    max_coord = local_max(output)
-    corners = torch.zeros(3, output.shape[0], output.shape[1])
-    grad_values = []
-    for idx, (i, j) in enumerate(max_coord):
-        cx, cy = draw.circle_perimeter(i, j, 5, shape=output.shape)
-        if idx < 4:
-            grad_values.append(gradient[cx.min():cx.max(), cy.min():cy.max()].sum())
-            if idx == 3:
-                corners[0, cx, cy] = 1.
-                corners[1, cx, cy] = 1.
-            else:
-                corners[idx, cx, cy] = 1.
-
-        else:
-            corners[:, cx, cy] = 1.
-    return rgb, output, corners, gradient, grad_values
+    corners, grad_values = corner_mask(output, gradient)
+    return rgb, output, gradient, corners, grad_values
 
 
 os.environ['ROS_MASTER_URI'] = 'http://192.168.102.10:11311'  # connection to raspberry pi
