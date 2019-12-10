@@ -6,6 +6,7 @@ from scipy.ndimage.measurements import center_of_mass, label
 import matplotlib.pyplot as plt
 import torch
 import skimage.draw as draw
+from PIL import ImageFilter
 
 
 def fill_zero_values(img):
@@ -84,5 +85,5 @@ def corner_mask(output, gradient):
 def depth_layers(depth):
     edges = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.FIND_EDGES))
     contours = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.CONTOUR))
-    depth = torch.stack((depth[0], edges[0], depth[0])).unsqueeze(0)
+    depth = torch.stack((depth[0], edges[0], contours[0])).unsqueeze(0)
     return depth
