@@ -30,7 +30,7 @@ def update(i):
     txt = ''
     max_colors = ['1st (red)', '2nd (green)', '3rd (blue)', '4th (yellow)']
     for idx, val in enumerate(grad_values):
-        txt += max_colors[idx] + '---> grad = ' + str(val) + '\n'
+        txt += max_colors[idx] + '---> grad = ' + str(val.item()) + '\n'
 
     text.set_text(txt)
 
@@ -47,7 +47,7 @@ def get_output():
     # we compute the edges and contour for the neural network
     edges = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.FIND_EDGES))
     contours = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.CONTOUR))
-    depth = torch.stack((depth[0], edges[0], contours[0])).unsqueeze(0)
+    depth = torch.stack((depth[0], edges[0], depth[0])).unsqueeze(0)
     output = model(depth).cpu().detach().numpy().clip(0)[0][0]
     max_out = max_gaussian(output)
     corners = torch.zeros(3, output.shape[0], output.shape[1])
@@ -103,7 +103,7 @@ a = Msg2Pixels()
 model = HourglassNet(Bottleneck)
 model = nn.DataParallel(model).cuda()
 model = nn.Sequential(model, nn.Conv2d(16, 1, kernel_size=1).cuda())
-checkpoint = torch.load('best_checkpoints/ckpt_1.pth')
+checkpoint = torch.load('best_checkpoints/ckpt_2.pth')
 model.load_state_dict(checkpoint['model_state_dict'])
 model.eval()
 
