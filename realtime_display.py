@@ -40,7 +40,6 @@ def get_output():
 
 
 os.environ['ROS_MASTER_URI'] = 'http://192.168.102.10:11311'  # connection to raspberry pi
-os.environ['ROS_IP'] = '192.168.102.10'
 
 a = Msg2Pixels()
 
