@@ -85,5 +85,5 @@ def corner_mask(output, gradient):
 def depth_layers(depth):
     edges = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.FIND_EDGES))
     contours = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.CONTOUR))
-    depth = torch.stack((depth[0], edges[0], contours[0])).unsqueeze(0)
+    depth = torch.stack((depth[0], depth[0], depth[0])).unsqueeze(0)
     return depth

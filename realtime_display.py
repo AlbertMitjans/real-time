@@ -47,7 +47,7 @@ a = Msg2Pixels()
 model = HourglassNet(Bottleneck)
 model = nn.DataParallel(model).cuda()
 model = nn.Sequential(model, nn.Conv2d(16, 1, kernel_size=1).cuda())
-checkpoint = torch.load('best_checkpoints/ckpt_1.pth')
+checkpoint = torch.load('best_checkpoints/ckpt_5.pth')
 model.load_state_dict(checkpoint['model_state_dict'])
 model.eval()
 
