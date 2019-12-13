@@ -82,6 +82,21 @@ def corner_mask(output, gradient):
     return corners, grad_values
 
 
+def corner_mask_color(output, color):
+    max_coord = local_max(output)
+    corners = torch.zeros(3, output.shape[0], output.shape[1])
+    for idx, (i, j) in enumerate(max_coord):
+        cx, cy = draw.circle_perimeter(i, j, 5, shape=output.shape)
+        if color == 'red':
+            corners[0, cx, cy] = 1.
+        if color == 'green':
+            corners[1, cx, cy] = 1.
+        if color == 'blue':
+            corners[2, cx, cy] = 1.
+
+    return corners
+
+
 def depth_layers(depth):
     edges = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.FIND_EDGES))
     contours = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.CONTOUR))

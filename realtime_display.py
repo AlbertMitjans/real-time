@@ -10,20 +10,33 @@ import numpy as np
 import torchvision.transforms as transforms
 from PIL import Image
 
-from Utils.img_utils import compute_gradient, cut_image, corner_mask, depth_layers
+from Utils.img_utils import compute_gradient, cut_image, corner_mask, depth_layers, corner_mask_color
+
+
+models = True
 
 
 def update(i):
-    rgb, output, gradient, corners, grad_values = get_output()
-    rgb, corners = transforms.ToPILImage()(rgb), transforms.ToPILImage()(corners)
-    image = Image.blend(rgb, corners, 0.5)
-    gradient = Image.blend(transforms.ToPILImage()((gradient*20).expand(3, -1, -1)), corners, 0.5)
-    im_rgb.set_data(image)
-    im_output.set_data(output)
-    im_gradient.set_data(gradient)
+    if not models:
+        rgb, output, gradient, corners = get_output(model)
+        rgb, corners = transforms.ToPILImage()(rgb), transforms.ToPILImage()(corners)
+        image = Image.blend(rgb, corners, 0.5)
+        gradient = Image.blend(transforms.ToPILImage()((gradient*20).expand(3, -1, -1)), corners, 0.5)
+        im_rgb.set_data(image)
+        im_output.set_data(output)
+        im_gradient.set_data(gradient)
+    if models:
+        rgb, output, _, corners = get_output(model, 'red')
+        _, output2, _, corners2 = get_output(model2, 'blue')
+        rgb, corners, corners2 = transforms.ToPILImage()(rgb), transforms.ToPILImage()(corners), transforms.ToPILImage()(corners2)
+        image = Image.blend(rgb, corners, 0.5)
+        image = Image.blend(image, corners2, 0.5)
+        im_rgb.set_data(image)
+        im_output.set_data(output)
+        im_output2.set_data(output2)
 
 
-def get_output():
+def get_output(model, color='red'):
     # we read the image and get rid of the borders (they have 0 values)
     rgb, depth = a.return_images()
     rgb, depth = cut_image(rgb), cut_image(depth)
@@ -35,8 +48,12 @@ def get_output():
     # we compute the edges and contour for the neural network
     depth = depth_layers(depth)
     output = model(depth).cpu().detach().numpy().clip(0)[0][0]
-    corners, grad_values = corner_mask(output, gradient)
-    return rgb, output, gradient, corners, grad_values
+    if not models:
+        corners, _ = corner_mask(output, gradient)
+    if models:
+        corners = corner_mask_color(output, color)
+
+    return rgb, output, gradient, corners
 
 
 os.environ['ROS_MASTER_URI'] = 'http://192.168.102.10:11311'  # connection to raspberry pi
@@ -47,23 +64,46 @@ a = Msg2Pixels()
 model = HourglassNet(Bottleneck)
 model = nn.DataParallel(model).cuda()
 model = nn.Sequential(model, nn.Conv2d(16, 1, kernel_size=1).cuda())
-checkpoint = torch.load('best_checkpoints/ckpt_5.pth')
+checkpoint = torch.load('best_checkpoints/ckpt_1.pth')
 model.load_state_dict(checkpoint['model_state_dict'])
 model.eval()
+if models:
+    model2 = HourglassNet(Bottleneck)
+    model2 = nn.DataParallel(model2).cuda()
+    model2 = nn.Sequential(model2, nn.Conv2d(16, 1, kernel_size=1).cuda())
+    checkpoint2 = torch.load('best_checkpoints/ckpt_6.pth')
+    model2.load_state_dict(checkpoint2['model_state_dict'])
+    model2.eval()
 
 # create two subplots
-fig, ax = plt.subplots(1, 3)
-ax[2].axis('off')
-ax[2].set_title('RGB image')
-ax[0].axis('off')
-ax[0].set_title('Network\'s output')
-ax[1].axis('off')
-ax[1].set_title('Gradient')
+if not models:
+    fig, ax = plt.subplots(1, 3)
+    ax[2].axis('off')
+    ax[2].set_title('RGB image')
+    ax[0].axis('off')
+    ax[0].set_title('Network\'s output')
+    ax[1].axis('off')
+    ax[1].set_title('Gradient')
+
+if models:
+    fig, ax = plt.subplots(1, 3)
+    ax[2].axis('off')
+    ax[2].set_title('RGB image')
+    ax[0].axis('off')
+    ax[0].set_title('1st network\'s output')
+    ax[1].axis('off')
+    ax[1].set_title('2nd network\'s output')
 
 # create two image plots
-im_rgb = ax[2].imshow(transforms.ToPILImage()(get_output()[0]))
-im_output = ax[0].imshow(get_output()[1], cmap='afmhot')
-im_gradient = ax[1].imshow(get_output()[2])
+if not models:
+    im_rgb = ax[2].imshow(transforms.ToPILImage()(get_output(model)[0]))
+    im_output = ax[0].imshow(get_output(model)[1], cmap='afmhot')
+    im_gradient = ax[1].imshow(get_output(model)[2])
+
+if models:
+    im_rgb = ax[2].imshow(transforms.ToPILImage()(get_output(model)[0]))
+    im_output = ax[0].imshow(get_output(model)[1], cmap='afmhot')
+    im_output2 = ax[1].imshow(get_output(model2)[1], cmap='afmhot')
 
 ani = FuncAnimation(fig, update, interval=1000/5)
 
