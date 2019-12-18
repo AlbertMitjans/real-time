@@ -12,7 +12,7 @@ class Msg2Pixels(object):
 
         self.images = [[], []]
 
-        self.sub_depth = rospy.Subscriber("/camera/depth_registered/sw_registered/image_rect_raw", Image,
+        self.sub_depth = rospy.Subscriber("/camera/depth_registered/hw_registered/image_rect_raw", Image,
                                           callback=self.convert_image_depth, callback_args=False, queue_size=1)
 
         self.sub_rgb = rospy.Subscriber("/camera/rgb/image_rect_color", Image, callback=self.convert_image_rgb,

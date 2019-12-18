@@ -97,8 +97,16 @@ def corner_mask_color(output, color):
     return corners
 
 
-def depth_layers(depth):
+def depth_layers(depth, layers):
     edges = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.FIND_EDGES))
     contours = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.CONTOUR))
-    depth = torch.stack((depth[0], depth[0], depth[0])).unsqueeze(0)
+    if layers == 'all':
+        depth = torch.stack((depth[0], edges[0], contours[0])).unsqueeze(0)
+    elif layers == 'edges':
+        depth = torch.stack((depth[0], edges[0], depth[0])).unsqueeze(0)
+    elif layers == 'contours':
+        depth = torch.stack((depth[0], depth[0], contours[0])).unsqueeze(0)
+    elif layers == 'depth':
+        depth = torch.stack((depth[0], depth[0], depth[0])).unsqueeze(0)
+
     return depth
