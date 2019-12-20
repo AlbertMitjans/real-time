@@ -4,14 +4,16 @@ import matplotlib.pyplot as plt
 
 
 def read_image(path1, path2):
-    img1 = cv2.imread(path1 + '.png')
-    if img1 is not None:
-        img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)
-    img2 = cv2.imread(path2 + '.png')
+    img1 = cv2.imread(path1 + '.tif', -1)
+    '''if img1 is not None:
+        img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2RGB)'''
+    img2 = cv2.imread(path2 + '.tif', -1)
 
     f, axarray = plt.subplots(1, 2, figsize=(20, 20))
-    axarray[0].imshow(img1)
-    axarray[1].imshow(img2)
+    axarray[0].imshow(img1, cmap='gray')
+    axarray[0].axis('off')
+    axarray[1].imshow(img2, cmap='gray')
+    axarray[1].axis('off')
     plt.show()
     plt.waitforbuttonpress()
     plt.close('all')
@@ -19,8 +21,8 @@ def read_image(path1, path2):
 
 j = 0
 
-path1 = '/home/amitjans/Desktop/Hourglass/data/rgb/image'
-path2 = '/home/amitjans/Desktop/Yolo/output/image'
+path1 = '/home/amitjans/Desktop/Hourglass/data/depth/image'
+path2 = '/media/amitjans/DATA/image'
 
 while True:
     print(j)

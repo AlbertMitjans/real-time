@@ -16,7 +16,7 @@ from Utils.img_utils import compute_gradient, cut_image, corner_mask, depth_laye
 models = True
 ckpt1 = 'ckpt_1_1'
 layers1 = 'all'
-ckpt2 = 'ckpt_11'
+ckpt2 = 'ckpt_10'
 layers2 = 'all'
 
 
