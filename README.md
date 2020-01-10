@@ -1,4 +1,4 @@
-# Real-time  
+# Real-time display (Python2.7)
 This repo contains the code structure to display the output of a neural network when using images from a connected camera as input.
 
 ## How to use it  
