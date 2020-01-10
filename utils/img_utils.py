@@ -36,19 +36,6 @@ def cut_image(img):
     return img
 
 
-def compute_gradient(image):
-    # we compute the gradient of the image
-    '''kx = np.array([[1, 0, -1], [2, 0, -2], [1, 0, -1]])
-        ky = np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]])
-        sx = ndimage.convolve(depth[0][0], kx)
-        sy = ndimage.convolve(depth[0][0], ky)'''
-    sx = ndimage.sobel(image, axis=0, mode='nearest')
-    sy = ndimage.sobel(image, axis=1, mode='nearest')
-    gradient = transforms.ToTensor()(np.hypot(sx, sy))
-
-    return gradient[0]
-
-
 def local_max(image):
     max_out = peak_local_max(image, min_distance=19, threshold_rel=0.5, exclude_border=False, indices=False)
     labels_out = label(max_out)[0]
@@ -63,17 +50,15 @@ def local_max(image):
     return max_out
 
 
-def corner_mask(output, gradient):
+def corner_mask(output):
     max_coord = local_max(output)
     corners = torch.zeros(3, output.shape[0], output.shape[1])
-    grad_values = []
     for idx, (i, j) in enumerate(max_coord):
         cx, cy = draw.circle_perimeter(i, j, 5, shape=output.shape)
         if idx < 4:
-            grad_values.append(gradient[cx.min():cx.max(), cy.min():cy.max()].sum())
             corners[0, cx, cy] = 1.
 
-    return corners, grad_values
+    return corners
 
 
 def corner_mask_color(output, color):

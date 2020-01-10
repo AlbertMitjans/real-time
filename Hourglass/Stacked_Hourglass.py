@@ -5,7 +5,6 @@ Use lr=0.01 for current version
 '''
 import torch.nn as nn
 import torch.nn.functional as F
-import torchvision.transforms.functional as func
 
 # from .preresnet import BasicBlock, Bottleneck
 
