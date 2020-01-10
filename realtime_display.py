@@ -7,51 +7,56 @@ import time
 import numpy as np
 import torchvision.transforms as transforms
 from PIL import Image
+import argparse
 
-from Hourglass.Stacked_Hourglass import HourglassNet, Bottleneck
+from model.Stacked_Hourglass import HourglassNet, Bottleneck
 from utils.msg_to_pixels import Msg2Pixels
-from utils.img_utils import cut_image, corner_mask, depth_layers, corner_mask_color
+from utils.img_utils import cut_image, depth_layers
 
 
-models = False
-ckpt1 = 'ckpt_11'
-layers1 = 'all'
-ckpt2 = 'ckpt_1_1'
-layers2 = 'all'
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--ckpt1", type=str, default="checkpoints/ckpt_1_1.pth", help="path to ckpt file")
+parser.add_argument("--ckpt2", type=str, default="checkpoints/ckpt_11.pth", help="path to ckpt file")
+parser.add_argument("--compare", type=str2bool, default=False, help="if True, the outputs of ckpt1 and ckpt2 will "
+                                                                    "be displayed in order to compare them")
+opt = parser.parse_args()
+
+models = opt.compare
+ckpt1 = opt.ckpt1
+ckpt2 = opt.ckpt2
 
 
 def update(i):
-    if not models:
-        rgb, output, corners = get_output(model, layers1)
-        out = torch.stack((transforms.ToTensor()(output)[0], torch.zeros(output.shape), torch.zeros(output.shape)))
-        out = transforms.ToPILImage()(out)
-        rgb, corners = transforms.ToPILImage()(rgb), transforms.ToPILImage()(corners)
-        image = Image.blend(rgb, out, 0.5)
-        im_rgb.set_data(image)
-        im_output.set_data(output)
+    rgb, output = get_output(model)
+    out = torch.stack((transforms.ToTensor()(output)[0], torch.zeros(output.shape), torch.zeros(output.shape)))
+    out = transforms.ToPILImage()(out)
+    rgb = transforms.ToPILImage()(rgb)
+    image = Image.blend(rgb, out, 0.5)
+    im_rgb.set_data(image)
+    im_output.set_data(output)
     if models:
-        rgb, output, corners = get_output(model, layers1, color='red')
-        _, output2, corners2 = get_output(model2, layers2, color='blue')
-        rgb, corners, corners2 = transforms.ToPILImage()(rgb), transforms.ToPILImage()(corners), transforms.ToPILImage()(corners2)
-        image = Image.blend(rgb, corners, 0.5)
-        #image = Image.blend(image, corners2, 0.5)
-        im_rgb.set_data(image)
-        im_output.set_data(output)
+        _, output2 = get_output(model2)
         im_output2.set_data(output2)
 
 
-def get_output(model, layers=layers1, color='red'):
+def get_output(model):
     depth, rgb = get_images()
     # we compute the edges and contour for the neural network
-    depth = depth_layers(depth, layers).cuda()
+    depth = depth_layers(depth).cuda()
     output = model(depth).cpu().detach().numpy().clip(0)[0][0]
 
-    if not models:
-        corners = corner_mask(output)
-    if models:
-        corners = corner_mask_color(output, color)
-
-    return rgb, output, corners
+    return rgb, output
 
 
 def get_images():
@@ -74,14 +79,14 @@ a = Msg2Pixels()
 model = HourglassNet(Bottleneck)
 model = nn.DataParallel(model).cuda()
 model = nn.Sequential(model, nn.Conv2d(16, 1, kernel_size=1).cuda())
-checkpoint = torch.load('best_checkpoints/{model}.pth'.format(model=ckpt1))
+checkpoint = torch.load('{model}'.format(model=ckpt1))
 model.load_state_dict(checkpoint['model_state_dict'])
 model.eval()
 if models:
     model2 = HourglassNet(Bottleneck)
     model2 = nn.DataParallel(model2).cuda()
     model2 = nn.Sequential(model2, nn.Conv2d(16, 1, kernel_size=1).cuda())
-    checkpoint2 = torch.load('best_checkpoints/{model}.pth'.format(model=ckpt2))
+    checkpoint2 = torch.load('{model}'.format(model=ckpt2))
     model2.load_state_dict(checkpoint2['model_state_dict'])
     model2.eval()
 
@@ -105,12 +110,12 @@ if models:
 # create two image plots
 if not models:
     im_rgb = ax[1].imshow(transforms.ToPILImage()(get_images()[1]))
-    im_output = ax[0].imshow(get_output(model, layers1)[1], cmap='afmhot', vmin=0, vmax=1)
+    im_output = ax[0].imshow(get_output(model)[1], cmap='afmhot', vmin=0, vmax=1)
 
 if models:
     im_rgb = ax[2].imshow(transforms.ToPILImage()(get_images()[1]))
-    im_output = ax[0].imshow(get_output(model, layers1)[1], cmap='afmhot', vmin=0, vmax=1)
-    im_output2 = ax[1].imshow(get_output(model2, layers2)[1], cmap='afmhot', vmin=0, vmax=1)
+    im_output = ax[0].imshow(get_output(model)[1], cmap='afmhot', vmin=0, vmax=1)
+    im_output2 = ax[1].imshow(get_output(model2)[1], cmap='afmhot', vmin=0, vmax=1)
 
 ani = FuncAnimation(fig, update, interval=1000/20)
 
