@@ -3,6 +3,11 @@ This repo contains the code structure to display the output of a neural network 
 
 ## How to use it  
 
+**Clone**  
+```
+git clone 
+```
+
 **Connect camera**  
 Connect an Asus XtionPRO LIVE camera and launch it as follows:
 ```
