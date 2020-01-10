@@ -27,8 +27,8 @@ def str2bool(v):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--ckpt1", type=str, default="checkpoints/ckpt_11.pth", help="path to ckpt file")
-parser.add_argument("--ckpt2", type=str, default="checkpoints/ckpt_9.pth", help="path to ckpt file")
-parser.add_argument("--compare", type=str2bool, default=True, help="if True, the outputs of ckpt1 and ckpt2 will "
+parser.add_argument("--ckpt2", type=str, default="checkpoints/ckpt_1_1.pth", help="path to ckpt file")
+parser.add_argument("--compare", type=str2bool, default=False, help="if True, the outputs of ckpt1 and ckpt2 will "
                                                                     "be displayed in order to compare them")
 opt = parser.parse_args()
 
@@ -47,7 +47,7 @@ def update(i):
         image = Image.blend(rgb, out, 0.5)
         im_rgb.set_data(image)
     if models:
-        _, output2 = get_output(model2, only_depth=True)
+        _, output2 = get_output(model2)
         out2 = torch.stack((transforms.ToTensor()(output)[0], transforms.ToTensor()(output2)[0], torch.zeros(output.shape)))
         out2 = transforms.ToPILImage()(out2)
         image = Image.blend(rgb, out2, 0.5)
@@ -90,7 +90,7 @@ model.eval()
 if models:
     model2 = HourglassNet(Bottleneck)
     model2 = nn.DataParallel(model2).cuda()
-    model2 = nn.Sequential(nn.Conv2d(1, 3, kernel_size=1).cuda(), model2, nn.Conv2d(16, 1, kernel_size=1).cuda())
+    model2 = nn.Sequential(model2, nn.Conv2d(16, 1, kernel_size=1).cuda())
     checkpoint2 = torch.load('{model}'.format(model=ckpt2))
     model2.load_state_dict(checkpoint2['model_state_dict'])
     model2.eval()
@@ -120,7 +120,7 @@ if not models:
 if models:
     im_rgb = ax[2].imshow(transforms.ToPILImage()(get_images()[1]))
     im_output = ax[0].imshow(get_output(model)[1], cmap='afmhot', vmin=0, vmax=1)
-    im_output2 = ax[1].imshow(get_output(model2, only_depth=True)[1], cmap='afmhot', vmin=0, vmax=1)
+    im_output2 = ax[1].imshow(get_output(model2)[1], cmap='afmhot', vmin=0, vmax=1)
 
 ani = FuncAnimation(fig, update, interval=1000/20)
 
