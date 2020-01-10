@@ -5,7 +5,7 @@ This repo contains the code structure to display the output of a neural network 
 
 **Clone**  
 ```
-git clone 
+git clone https://github.com/AlbertMitjans/Real-time.git
 ```
 
 **Connect camera**  
