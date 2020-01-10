@@ -13,10 +13,10 @@ from PIL import Image
 from Utils.img_utils import compute_gradient, cut_image, corner_mask, depth_layers, corner_mask_color
 
 
-models = True
-ckpt1 = 'ckpt_1_1'
+models = False
+ckpt1 = 'ckpt_11'
 layers1 = 'all'
-ckpt2 = 'ckpt_10'
+ckpt2 = 'ckpt_1_1'
 layers2 = 'all'
 
 
@@ -43,7 +43,7 @@ def update(i):
 def get_output(model, layers=layers1, color='red'):
     depth, rgb, gradient = get_images()
     # we compute the edges and contour for the neural network
-    depth = depth_layers(depth, layers)
+    depth = depth_layers(depth, layers).cuda()
     output = model(depth).cpu().detach().numpy().clip(0)[0][0]
 
     if not models:

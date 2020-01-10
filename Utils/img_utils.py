@@ -32,7 +32,7 @@ def fill_zero_values(img):
 
 
 def cut_image(img):
-    img = img[152:456, 92:585]
+    img = img[80:-30, :-60]
     return img
 
 
@@ -71,14 +71,8 @@ def corner_mask(output, gradient):
         cx, cy = draw.circle_perimeter(i, j, 5, shape=output.shape)
         if idx < 4:
             grad_values.append(gradient[cx.min():cx.max(), cy.min():cy.max()].sum())
-            if idx == 3:
-                corners[0, cx, cy] = 1.
-                corners[1, cx, cy] = 1.
-            else:
-                corners[idx, cx, cy] = 1.
+            corners[0, cx, cy] = 1.
 
-        else:
-            corners[:, cx, cy] = 1.
     return corners, grad_values
 
 
@@ -108,5 +102,7 @@ def depth_layers(depth, layers):
         depth = torch.stack((depth[0], depth[0], contours[0])).unsqueeze(0)
     elif layers == 'depth':
         depth = torch.stack((depth[0], depth[0], depth[0])).unsqueeze(0)
+    elif layers == 'one':
+        depth = depth.unsqueeze(0)
 
     return depth
