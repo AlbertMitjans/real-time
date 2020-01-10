@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from Utils.msg_to_pixels import Msg2Pixels
-from Hourglass.Stacked_Hourglass import HourglassNet, Bottleneck
 import torch.nn as nn
 import torch
 import os
@@ -10,7 +8,9 @@ import numpy as np
 import torchvision.transforms as transforms
 from PIL import Image
 
-from Utils.img_utils import compute_gradient, cut_image, corner_mask, depth_layers, corner_mask_color
+from Hourglass.Stacked_Hourglass import HourglassNet, Bottleneck
+from utils.msg_to_pixels import Msg2Pixels
+from utils.img_utils import cut_image, corner_mask, depth_layers, corner_mask_color
 
 
 models = False
@@ -22,16 +22,16 @@ layers2 = 'all'
 
 def update(i):
     if not models:
-        rgb, output, gradient, corners = get_output(model, layers1)
+        rgb, output, corners = get_output(model, layers1)
+        out = torch.stack((transforms.ToTensor()(output)[0], torch.zeros(output.shape), torch.zeros(output.shape)))
+        out = transforms.ToPILImage()(out)
         rgb, corners = transforms.ToPILImage()(rgb), transforms.ToPILImage()(corners)
-        image = Image.blend(rgb, corners, 0.5)
-        gradient = Image.blend(transforms.ToPILImage()((gradient*20).expand(3, -1, -1)), corners, 0.5)
+        image = Image.blend(rgb, out, 0.5)
         im_rgb.set_data(image)
         im_output.set_data(output)
-        im_gradient.set_data(gradient)
     if models:
-        rgb, output, _, corners = get_output(model, layers1, color='red')
-        _, output2, _, corners2 = get_output(model2, layers2, color='blue')
+        rgb, output, corners = get_output(model, layers1, color='red')
+        _, output2, corners2 = get_output(model2, layers2, color='blue')
         rgb, corners, corners2 = transforms.ToPILImage()(rgb), transforms.ToPILImage()(corners), transforms.ToPILImage()(corners2)
         image = Image.blend(rgb, corners, 0.5)
         #image = Image.blend(image, corners2, 0.5)
@@ -41,17 +41,17 @@ def update(i):
 
 
 def get_output(model, layers=layers1, color='red'):
-    depth, rgb, gradient = get_images()
+    depth, rgb = get_images()
     # we compute the edges and contour for the neural network
     depth = depth_layers(depth, layers).cuda()
     output = model(depth).cpu().detach().numpy().clip(0)[0][0]
 
     if not models:
-        corners, _ = corner_mask(output, gradient)
+        corners = corner_mask(output)
     if models:
         corners = corner_mask_color(output, color)
 
-    return rgb, output, gradient, corners
+    return rgb, output, corners
 
 
 def get_images():
@@ -62,9 +62,8 @@ def get_images():
     rgb, depth = cut_image(rgb), cut_image(depth)
     rgb, depth = transforms.ToTensor()(rgb), transforms.ToTensor()(depth.astype(np.float32))
     depth = depth / depth.max()
-    gradient = compute_gradient(depth[0])
 
-    return depth, rgb, gradient
+    return depth, rgb
 
 
 os.environ['ROS_MASTER_URI'] = 'http://192.168.102.15:11311'  # connection to raspberry pi
@@ -88,13 +87,11 @@ if models:
 
 # create two subplots
 if not models:
-    fig, ax = plt.subplots(1, 3)
-    ax[2].axis('off')
-    ax[2].set_title('RGB image')
+    fig, ax = plt.subplots(1, 2)
+    ax[1].axis('off')
+    ax[1].set_title('RGB image')
     ax[0].axis('off')
     ax[0].set_title('Network\'s output')
-    ax[1].axis('off')
-    ax[1].set_title('Gradient')
 
 if models:
     fig, ax = plt.subplots(1, 3)
@@ -107,9 +104,8 @@ if models:
 
 # create two image plots
 if not models:
-    im_rgb = ax[2].imshow(transforms.ToPILImage()(get_images()[1]))
+    im_rgb = ax[1].imshow(transforms.ToPILImage()(get_images()[1]))
     im_output = ax[0].imshow(get_output(model, layers1)[1], cmap='afmhot', vmin=0, vmax=1)
-    im_gradient = ax[1].imshow(get_images()[2])
 
 if models:
     im_rgb = ax[2].imshow(transforms.ToPILImage()(get_images()[1]))
