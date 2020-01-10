@@ -12,9 +12,12 @@ def cut_image(img):
     return img
 
 
-def depth_layers(depth):
-    edges = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.FIND_EDGES))
-    contours = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.CONTOUR))
-    depth = torch.stack((depth[0], edges[0], contours[0])).unsqueeze(0)
+def depth_layers(depth, only_depth=False):
+    if not only_depth:
+        edges = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.FIND_EDGES))
+        contours = transforms.ToTensor()(transforms.ToPILImage()(depth[0]).convert('L').filter(ImageFilter.CONTOUR))
+        depth = torch.stack((depth[0], edges[0], contours[0])).unsqueeze(0)
+    if only_depth:
+        depth = depth.unsqueeze(0)
 
     return depth
