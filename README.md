@@ -1,9 +1,9 @@
-# Real-time
+# Real-time  
 This repo contains the code structure to display the output of a neural network when using images from a connected camera as input.
 
-## How to use it
+## How to use it  
 
-**Connect camera**
+**Connect camera**  
 Connect an Asus XtionPRO LIVE camera and launch it as follows:
 ```
 roslaunch openni2_launch openni2.launch depth_registration:=true
