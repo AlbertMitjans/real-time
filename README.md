@@ -1,16 +1,13 @@
-# Real-time display and image capture(Python2.7)
-This repo contains the code structure to display the output of a neural network when using images from a connected camera as input. It also contains a script to capture images with their respective annotations (go to 'Image capture' section for more information).
+# Real-time display and image capture (Python2.7)
+This repo contains the code structure to display in real-time (a depth camera is needed) the output of a ![network](https://github.com/AlbertMitjans/pytorch-corner-detection) designed to detect the corners of a wrinkled towel. It also contains a script to capture images (with their respective annotations) to create a dataset for the aforementioned network.
 
 ## Installation
 
-**Clone**  
+**Clone and install requirements**  
 ```
 $ git clone https://github.com/AlbertMitjans/real-time.git
-```
-
-**Dependencies**
-```
-$ 
+$ cd real-time
+$ ???
 ```
 
 **Download pre-trained weights**
@@ -53,14 +50,16 @@ When capturing, the following files will be saved in the given path:
 + image0.csv : A CSV file with the center coordinates of the red/green/yellow/blue colors in the image.  
 + image0.pcd : A PCD file with the pointcloud of the image.  
 
-Also, an RGB image with colored circles on the detected "corners" will be displayed for 3 seconds in order for you to see if the detection was succesfull. You can change the time of the display with the argument display_time.
+Also, an RGB image with colored circles on the detected "corners" will be displayed for 3 seconds in order for you to see if the detection was succesfull. You can change the time of the display with the argument display_time.  
 
-![alt text](https://github.com/AlbertMitjans/real-time/edit/master/assets/corners.png)
+<p align="center">
+  <img width="460" height="300" src="assets/corners.png">
+</p>
 
 The script will always start from 0 (CAREFUL, if you already have the image0 files, it will overwrite them!).
 To start counting from another number, you just have to write the number in the terminal/console. 
 
 **Arguments**  
---path (default=None) : path to folder  
---ros_master_uri (default=http://192.168.102.15:11311) : connection to raspberry pi
+--path (default=None) : path to folder.  
+--ros_master_uri (default=http://<span></span>192.168.102.15:11311) : connection to raspberry pi.  
 --display_time (default=3) : time of the display (in seconds) of the RGB image with the colored circles.
