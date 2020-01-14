@@ -61,5 +61,5 @@ To start counting from another number, you just have to write the number in the 
 
 **Arguments**  
 --path (default=None) : path to folder.  
---ros_master_uri (default=%http://<span></span>192.168.102.15:11311%) : connection to raspberry pi.  
+--ros_master_uri (default=http://<span></span>192.168.102.15:11311) : connection to raspberry pi.  
 --display_time (default=3) : time of the display (in seconds) of the RGB image with the colored circles.
