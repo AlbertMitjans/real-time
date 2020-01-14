@@ -3,14 +3,11 @@ This repo contains the code structure to display in real-time (a depth camera is
 
 ## Installation
 
-**Clone**  
+**Clone and install requirements**  
 ```
 $ git clone https://github.com/AlbertMitjans/real-time.git
-```
-
-**Dependencies**
-```
-$ 
+$ cd real-time
+$ ???
 ```
 
 **Download pre-trained weights**
