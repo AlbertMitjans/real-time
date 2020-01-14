@@ -3,11 +3,17 @@ This repo contains the code structure to display in real-time (a depth camera is
 
 ## Installation
 
+**Create conda environment**
+```
+$ conda create -n ENVIRONMENT_NAME python=2
+$ conda activate ENVIRONMENT_NAME
+```
+
 **Clone and install requirements**  
 ```
 $ git clone https://github.com/AlbertMitjans/real-time.git
 $ cd real-time
-$ ???
+$ conda install requirements.txt
 ```
 
 **Download pre-trained weights**
