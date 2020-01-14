@@ -30,7 +30,7 @@ Press "s" to save an image.
 Press "q" to quit.
 
 <p align="center">
-  <img width="660" height="500" src="assets/real-time.png">
+  <src="assets/real-time.png">
 </p>
 
 **Arguments**  
