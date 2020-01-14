@@ -53,9 +53,9 @@ When capturing, the following files will be saved in the given path:
 + image0.csv : A CSV file with the center coordinates of the red/green/yellow/blue colors in the image.  
 + image0.pcd : A PCD file with the pointcloud of the image.  
 
-Also, an RGB image with colored circles on the detected "corners" will be displayed for 3 seconds in order for you to see if the detection was succesfull. You can change the time of the display with the argument display_time.
+Also, an RGB image with colored circles on the detected "corners" will be displayed for 3 seconds in order for you to see if the detection was succesfull. You can change the time of the display with the argument display_time.  
 
-![alt text](https://github.com/AlbertMitjans/real-time/edit/master/assets/corners.png)
+![Image](https://github.com/AlbertMitjans/real-time/edit/master/assets/corners.png)
 
 The script will always start from 0 (CAREFUL, if you already have the image0 files, it will overwrite them!).
 To start counting from another number, you just have to write the number in the terminal/console. 
