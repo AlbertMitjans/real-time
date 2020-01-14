@@ -138,9 +138,6 @@ def action(event):
     if event.key == 'q':
         plt.close(event.canvas.figure)
 
-    if event.key == 's':
-        plt.savefig('images/image' + str(time.time()) + '.png')
-
 
 cid = plt.gcf().canvas.mpl_connect("key_press_event", action)
 

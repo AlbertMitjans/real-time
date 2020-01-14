@@ -5,7 +5,7 @@ import cv2
 
 
 def hsv_segmentation(path, display_time):
-    for i in range(100):
+    for i in range(10):
         rgb_image = cv2.imread(path + '_rgb.png', -1)
         if rgb_image is None:
             time.sleep(0.5)  # we wait until the image is saved (so we can open it)
@@ -65,7 +65,6 @@ def hsv_segmentation(path, display_time):
     # we show the image with the drawn circles
     plt.figure()
     plt.imshow(cv2.cvtColor(rgb_image, cv2.COLOR_BGR2RGB))
-    plt.savefig(path + 'corners.png')
     plt.show(block=False)
     plt.pause(display_time)
     plt.close('all')

@@ -1,0 +1,8 @@
+rospkg
+matplotlib
+python-pcl
+pandas
+torchvision
+pytorch==1.3.1
+scikit-image
+

@@ -5,7 +5,7 @@ import argparse
 parser = argparse.ArgumentParser('hello')
 parser.add_argument("--ros_master_uri", type=str, default='http://192.168.102.15:11311', help="connection to "
                                                                                               "raspberry pi")
-parser.add_argument("--path", type=str, default=None, help="path to dataset folder")
+parser.add_argument("--name", type=str, default=None, help="name of the directory where the data will be saved")
 parser.add_argument("--display_time", type=int, default=3, help="time of the display of the RGB image with the "
                                                                 "colored circles")
 opt = parser.parse_args()
@@ -14,7 +14,14 @@ os.environ['ROS_MASTER_URI'] = opt.ros_master_uri  # connection to raspberry pi
 
 i = 0
 
-path = opt.path
+try:
+    path = os.path.abspath(opt.name)
+except AttributeError:
+    print('Write a valid directory name')
+    exit()
+
+if not os.path.exists(path):
+    os.mkdir(path)
 a = Msg2Pixels(save_pcl=True)
 
 while True:
