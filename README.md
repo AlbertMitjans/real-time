@@ -7,6 +7,7 @@ This repo contains the code structure to display in real-time (a depth camera is
 ```
 $ conda create -n ENVIRONMENT_NAME python=2
 $ conda activate ENVIRONMENT_NAME
+$ conda config --append channels ccordoba12 --append channels conda-forge  
 ```
 
 **Clone and install requirements**  
@@ -32,7 +33,6 @@ $ roslaunch openni2_launch openni2.launch depth_registration:=true
 ```
 $ python2 realtime_display.py --ckpt1 CKPT1 --ckpt2 CKPT2 --compare TRUE/FALSE
 ```
-Press "s" to save an image.  
 Press "q" to quit.
 
 <p align="center">
