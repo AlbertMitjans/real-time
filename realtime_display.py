@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import matplotlib.animation as animation
 import torch.nn as nn
 import torch
 import os
@@ -26,8 +27,8 @@ def str2bool(v):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--ckpt1", type=str, default="checkpoints/ckpt_11.pth", help="path to ckpt file")
-parser.add_argument("--ckpt2", type=str, default="checkpoints/ckpt_1_1.pth", help="path to ckpt file")
+parser.add_argument("--ckpt1", type=str, default="checkpoints/model.pth", help="path to ckpt file")
+parser.add_argument("--ckpt2", type=str, default=None, help="path to ckpt file")
 parser.add_argument("--compare", type=str2bool, default=False, help="if True, the outputs of ckpt1 and ckpt2 will "
                                                                     "be displayed in order to compare them")
 opt = parser.parse_args()
@@ -80,6 +81,14 @@ os.environ['ROS_MASTER_URI'] = 'http://192.168.102.15:11311'  # connection to ra
 
 a = Msg2Pixels()
 
+# Fixing random state for reproducibility
+np.random.seed(19680801)
+
+
+# Set up formatting for the movie files
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=20)
+
 # initiate model
 model = HourglassNet(Bottleneck)
 model = nn.DataParallel(model).cuda()
@@ -122,7 +131,7 @@ if models:
     im_output = ax[0].imshow(get_output(model)[1], cmap='afmhot', vmin=0, vmax=1)
     im_output2 = ax[1].imshow(get_output(model2)[1], cmap='afmhot', vmin=0, vmax=1)
 
-ani = FuncAnimation(fig, update, interval=1000/20)
+ani = FuncAnimation(fig, update, interval=1000/20, save_count=1000)
 
 
 def action(event):
@@ -136,3 +145,5 @@ def action(event):
 cid = plt.gcf().canvas.mpl_connect("key_press_event", action)
 
 plt.show()
+
+#ani.save('video.mp4', writer=writer)
