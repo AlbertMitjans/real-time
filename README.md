@@ -1,5 +1,5 @@
 # Real-time display and image capture(Python2.7)
-This repo contains the code structure to display the output of a neural network when using images from a connected camera as input. It also contains a script to capture images with their annotations (see 'Image capture' section).
+This repo contains the code structure to display the output of a neural network when using images from a connected camera as input. It also contains a script to capture images with their respective annotations (go to 'Image capture' section for more information).
 
 ## Installation
 
