@@ -10,8 +10,10 @@ import numpy as np
 
 
 class Msg2Pixels(object):
-    def __init__(self, save_pcl=False):
+    def __init__(self, save_pcl=False, display_time=3):
         rospy.init_node('msg_to_pixels', anonymous=True, disable_signals=True)
+
+        self.display_time = display_time
 
         self.save_pcl = save_pcl
 
@@ -84,7 +86,7 @@ class Msg2Pixels(object):
                 while True:
                     cv2.imwrite(path + "_rgb.png", self.images[0])
                     cv2.imwrite(path + "_depth.png", self.images[1])
-                    hsv_segmentation(path)
+                    hsv_segmentation(path, self.display_time)
                     pcl.save(self.pcl_points, path + '.pcd', binary=True)
                     break
                 break
