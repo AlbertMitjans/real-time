@@ -38,7 +38,7 @@ Press "q" to quit.
 --compare (default=False) : if True the outputs of ckpt1 and ckpt2 will be displayed.  
 
 ## Image capture
-This script can be used to generate depth images of wrinkled cloths with the position of their visible corners as annotations. To do so, each corner of the cloth must have one of this colors (without repeting any): red, green, blue and yellow. The script will use color segmentation to measure each corner's coordinates.
+This script can be used to generate depth images of wrinkled cloths and annotate the position of their visible corners. To do so, each corner of the cloth must have one of this colors (without repeting any): red, green, blue and yellow. The script will use color segmentation to measure each corner's coordinates.
 ```
 $ python2 capture_images.py --path PATH
 ```
