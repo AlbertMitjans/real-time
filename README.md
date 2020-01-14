@@ -24,6 +24,8 @@ $ roslaunch openni2_launch openni2.launch depth_registration:=true
 ```
 $ python2 realtime_display.py --ckpt1 CKPT1 --ckpt2 CKPT2 --compare TRUE/FALSE
 ```
+Press "s" to save an image.
+Press "q" to quit.
 
 **Arguments**  
 --ckpt1 (default="checkpoints/ckpt.pth") : path to checkpoint/model file  
