@@ -56,6 +56,6 @@ When capturing, the following files will be saved in the given path:
 The script will always start from 0 (CAREFUL, if you already have the image0 files, it will overwrite them!).
 To start counting from another number, you just have to write the number in the terminal/console. 
 
-**Arguments**
+**Arguments**  
 --path (default=None) : path to folder  
 --ros_master_uri (default=http://192.168.102.15:11311) : connection to raspberry pi  
