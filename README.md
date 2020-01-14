@@ -1,5 +1,5 @@
 # Real-time display and image capture (Python2.7)
-This repo contains the code structure to display in real-time (a depth camera is needed) the output of a ![network](https://github.com/AlbertMitjans/pytorch-corner-detection) designed to detect the corners of a wrinkled towel. It also contains a script to capture images (with their respective annotations) to train the aforementioned network.
+This repo contains the code structure to display in real-time (a depth camera is needed) the output of a ![network](https://github.com/AlbertMitjans/pytorch-corner-detection) designed to detect the corners of a wrinkled towel. It also contains a script to capture images (with their respective annotations) to create a dataset for the aforementioned network.
 
 ## Installation
 
