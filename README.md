@@ -29,6 +29,10 @@ $ python2 realtime_display.py --ckpt1 CKPT1 --ckpt2 CKPT2 --compare TRUE/FALSE
 Press "s" to save an image.  
 Press "q" to quit.
 
+<p align="center">
+  <img width="460" height="300" src="assets/real-time.png">
+</p>
+
 **Arguments**  
 --ckpt1 (default="checkpoints/ckpt.pth") : path to checkpoint/model file.  
 --ckpt2 (default="checkpoints/ckpt_2.pth") : path to checkpoint/model file (only used when compare=True).  
