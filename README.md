@@ -40,8 +40,8 @@ Press "q" to quit.
 </p>
 
 **Arguments**  
---ckpt1 (default="checkpoints/ckpt.pth") : path to checkpoint/model file.  
---ckpt2 (default="checkpoints/ckpt_2.pth") : path to checkpoint/model file (only used when compare=True).  
+--ckpt1 (default="checkpoints/model.pth") : path to checkpoint/model file.  
+--ckpt2 (default="checkpoints/extra_conv.pth") : path to checkpoint/model file (only used when compare=True).  
 --compare (default=False) : if True the outputs of ckpt1 and ckpt2 will be displayed.  
 
 ## Image capture
@@ -68,6 +68,12 @@ Also, an RGB image with colored circles on the detected "corners" will be displa
 
 The script will always start from 0 (CAREFUL, if you already have the image0 files, it will overwrite them!).
 To start counting from another number, you just have to write the number in the terminal/console. 
+
+To obtain better results with the color segmentation, you can choose to disable the auto_exposure and auto_white_balance of the camera by running the following command and unticking both options in the *Driver* section.
+
+```
+rosrun rqt_reconfigure rqt_reconfigure
+```
 
 **Arguments**  
 --name (default=None) : name of the directory where the data will be saved.  
