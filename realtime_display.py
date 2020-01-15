@@ -28,7 +28,7 @@ def str2bool(v):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--ckpt1", type=str, default="checkpoints/model.pth", help="path to ckpt file")
-parser.add_argument("--ckpt2", type=str, default=None, help="path to ckpt file")
+parser.add_argument("--ckpt2", type=str, default="checkpoints/extra_conv.pth", help="path to ckpt file")
 parser.add_argument("--compare", type=str2bool, default=False, help="if True, the outputs of ckpt1 and ckpt2 will "
                                                                     "be displayed in order to compare them")
 opt = parser.parse_args()
