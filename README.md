@@ -40,8 +40,8 @@ Press "q" to quit.
 </p>
 
 **Arguments**  
---ckpt1 (default="checkpoints/ckpt.pth") : path to checkpoint/model file.  
---ckpt2 (default="checkpoints/ckpt_2.pth") : path to checkpoint/model file (only used when compare=True).  
+--ckpt1 (default="checkpoints/model.pth") : path to checkpoint/model file.  
+--ckpt2 (default="checkpoints/extra_conv.pth") : path to checkpoint/model file (only used when compare=True).  
 --compare (default=False) : if True the outputs of ckpt1 and ckpt2 will be displayed.  
 
 ## Image capture
