@@ -69,7 +69,7 @@ Also, an RGB image with colored circles on the detected "corners" will be displa
 The script will always start from 0 (CAREFUL, if you already have the image0 files, it will overwrite them!).
 To start counting from another number, you just have to write the number in the terminal/console. 
 
-To obtain better results in the color segmentation, you can choose to disable the auto_exposure and the auto_white_balance of the camera by running the following command and unticking the options in the *Driver* section.
+To obtain better results with the color segmentation, you can choose to disable the auto_exposure and auto_white_balance of the camera by running the following command and unticking both options in the *Driver* section.
 
 ```
 rosrun rqt_reconfigure rqt_reconfigure
