@@ -69,6 +69,12 @@ Also, an RGB image with colored circles on the detected "corners" will be displa
 The script will always start from 0 (CAREFUL, if you already have the image0 files, it will overwrite them!).
 To start counting from another number, you just have to write the number in the terminal/console. 
 
+To obtain better results in the color segmentation, you can choose to disable the auto_exposure and the auto_white_balance of the camera by running the following command and unticking the options in the *Driver* section.
+
+```
+rosrun rqt_reconfigure rqt_reconfigure
+```
+
 **Arguments**  
 --name (default=None) : name of the directory where the data will be saved.  
 --ros_master_uri (default=http://<span></span>192.168.102.15:11311) : connection to raspberry pi.  
